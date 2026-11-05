@@ -6,9 +6,14 @@ import {
   Shirt,
   Snowflake,
   Sparkles,
+  Umbrella,
   type LucideIcon,
 } from 'lucide-react'
-import type { MockForecast, WardrobeIcon } from '../data/mockForecasts'
+import type {
+  WardrobeIcon,
+  WardrobeRecommendation,
+} from '../data/mockWardrobe'
+import type { CurrentWeather } from '../services/weatherService'
 
 const wardrobeIcons: Record<WardrobeIcon, LucideIcon> = {
   coat: Shirt,
@@ -17,13 +22,16 @@ const wardrobeIcons: Record<WardrobeIcon, LucideIcon> = {
   layers: Layers,
   sunglasses: Glasses,
   boots: Footprints,
+  tee: Shirt,
+  umbrella: Umbrella,
 }
 
 type WardrobeCardProps = {
-  forecast: MockForecast
+  weather: CurrentWeather
+  wardrobe: WardrobeRecommendation
 }
 
-export function WardrobeCard({ forecast }: WardrobeCardProps) {
+export function WardrobeCard({ weather, wardrobe }: WardrobeCardProps) {
   return (
     <section
       aria-labelledby="wardrobe-title"
@@ -49,11 +57,14 @@ export function WardrobeCard({ forecast }: WardrobeCardProps) {
               <Sparkles className="size-5 text-sky-300" aria-hidden="true" />
             </span>
             <div>
-              <h2 id="wardrobe-title" className="text-sm font-semibold tracking-tight text-white">
+              <h2
+                id="wardrobe-title"
+                className="text-sm font-semibold tracking-tight text-white"
+              >
                 AI Wardrobe Recommendation
               </h2>
               <p className="mt-0.5 text-[11px] text-slate-400">
-                {forecast.wardrobe.summary} · {forecast.city}, {forecast.temperature}°C
+                {wardrobe.summary} · {weather.city}, {weather.temperature}°C
               </p>
             </div>
           </div>
@@ -64,7 +75,7 @@ export function WardrobeCard({ forecast }: WardrobeCardProps) {
         </div>
 
         <p className="mt-6 max-w-xl text-pretty text-xl font-medium leading-snug tracking-[-0.015em] text-slate-100 sm:text-[22px]">
-          {forecast.wardrobe.advice}
+          {wardrobe.advice}
         </p>
 
         <div className="mt-6">
@@ -72,7 +83,7 @@ export function WardrobeCard({ forecast }: WardrobeCardProps) {
             Today&rsquo;s picks
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
-            {forecast.wardrobe.picks.map((pick) => {
+            {wardrobe.picks.map((pick) => {
               const PickIcon = wardrobeIcons[pick.icon]
 
               return (
@@ -80,7 +91,10 @@ export function WardrobeCard({ forecast }: WardrobeCardProps) {
                   key={pick.label}
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-2 text-[13px] font-medium text-slate-200 backdrop-blur"
                 >
-                  <PickIcon className="size-4 shrink-0 text-sky-300" aria-hidden="true" />
+                  <PickIcon
+                    className="size-4 shrink-0 text-sky-300"
+                    aria-hidden="true"
+                  />
                   {pick.label}
                 </li>
               )
@@ -90,7 +104,8 @@ export function WardrobeCard({ forecast }: WardrobeCardProps) {
 
         <p className="mt-6 flex items-start gap-2 border-t border-white/10 pt-4 text-[11px] leading-relaxed text-slate-400">
           <Info className="mt-px size-3.5 shrink-0" aria-hidden="true" />
-          Mock response for this UI phase. Live weather and AI styling will be connected later.
+          Mock recommendation based on live temperature. Real AI styling arrives in
+          the next phase.
         </p>
       </div>
     </section>

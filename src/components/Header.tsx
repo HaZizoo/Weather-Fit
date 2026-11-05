@@ -22,9 +22,9 @@ export function Header() {
           </span>
         </a>
 
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-amber-200/80 bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
-          <span className="size-1.5 rounded-full bg-amber-500" aria-hidden="true" />
-          Demo mode
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
+          <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+          Live weather
         </span>
       </div>
     </header>

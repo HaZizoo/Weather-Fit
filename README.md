@@ -1,8 +1,7 @@
 # Weather Fit
 
-A weather-aware wardrobe assistant — search a city, see the current conditions,
-and get an AI outfit recommendation. This first phase is UI scaffolding only:
-every forecast and recommendation is hardcoded mock data.
+A weather-aware wardrobe assistant — search a city, see live current
+conditions, and preview a mock AI outfit recommendation.
 
 ## Stack
 
@@ -10,11 +9,32 @@ every forecast and recommendation is hardcoded mock data.
 - Vite 8
 - Tailwind CSS 4 (via `@tailwindcss/vite`)
 - lucide-react icons
+- OpenWeatherMap Current Weather API
 
 ## Getting started
 
 ```bash
 npm install
+```
+
+Create a local environment file and add your key:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env`:
+
+```
+VITE_WEATHER_API_KEY=your_openweathermap_api_key
+```
+
+You can create a key at
+[home.openweathermap.org/api_keys](https://home.openweathermap.org/api_keys).
+New keys can take a few minutes to become active. Restart `npm run dev` after
+adding or changing the key.
+
+```bash
 npm run dev
 ```
 
@@ -30,26 +50,37 @@ npm run preview # serve the production build
 
 ```
 src/
-  App.tsx                        Page layout + mock search state
-  data/mockForecasts.ts          Typed sample forecasts and wardrobe picks
+  App.tsx                        Search lifecycle, loading/error states
+  services/weatherService.ts     OpenWeatherMap fetch, validation, errors
+  data/mockWardrobe.ts           Temperature-based mock recommendation
   components/
-    Header.tsx                   Logo, title, demo badge
+    Header.tsx                   Logo, title, live-data badge
     SearchBar.tsx                Controlled city search + feedback
-    CurrentWeatherCard.tsx       Temperature, condition, stats
-    WardrobeCard.tsx             AI recommendation + outfit picks
+    CurrentWeatherCard.tsx       Live conditions and dynamic icons
+    WardrobeCard.tsx             AI recommendation preview
+    WeatherStates.tsx            Loading skeleton + error card
 ```
 
-## What is mocked
+## How it works
 
-- Three cities: Düsseldorf, Lisbon, and Oslo. Searching for one of them swaps the
-  displayed forecast; other cities show an "no sample forecast" hint.
-- Weather values, condition icons, and wardrobe advice all come from
-  `src/data/mockForecasts.ts`.
-- No network requests are made. There is no OpenWeather, Groq, or OpenAI
-  integration yet.
+- Searches call the OpenWeatherMap Current Weather API through
+  `src/services/weatherService.ts`.
+- Responses are validated and normalized into a typed `CurrentWeather` model.
+- Requests time out after 10 seconds and map HTTP/network failures to
+  user-friendly errors. A search can be retried from the error card.
+- Both metric and wind speed are normalized for the UI (m/s → km/h).
+- Weather condition IDs select the matching day or night icon.
 
-## Next step
+## Still mocked
 
-Connect a weather API for the search results, then pass the forecast to an LLM to
-generate the wardrobe recommendation. Replace the mock state in `App.tsx` with the
-real request lifecycle and keep the existing presentational components.
+The wardrobe recommendation is rule-based for now: `src/data/mockWardrobe.ts`
+picks outfit advice from the real temperature band. The AI card is unchanged
+visually, and the real LLM will replace `buildMockWardrobe` in the next phase.
+
+## API key note
+
+Vite exposes `VITE_*` variables to the browser bundle, so this key is public by
+design. That is acceptable for a local portfolio demo, but a production app
+should proxy OpenWeatherMap requests through a server so the key stays private.
+
+Weather data by [OpenWeatherMap](https://openweathermap.org/).
