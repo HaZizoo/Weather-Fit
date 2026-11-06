@@ -8,7 +8,8 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
 ## 📱 Project Preview
-*(Insert your screenshot or GIF here)*
+*<img width="630" height="871" alt="image" src="https://github.com/user-attachments/assets/a99f1fb9-f392-48d6-9b8d-dcb1ad7e3ac9" />
+*
 `![Weather-Fit Demo](./assets/demo.gif)`
 
 ## 🚀 Overview
