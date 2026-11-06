@@ -4,7 +4,12 @@ import { Header } from './components/Header'
 import { SearchBar } from './components/SearchBar'
 import { WardrobeCard } from './components/WardrobeCard'
 import { WeatherErrorCard, WeatherSkeleton } from './components/WeatherStates'
-import { buildMockWardrobe } from './data/mockWardrobe'
+import {
+  fetchWardrobeRecommendation,
+  toAiServiceError,
+  type AiServiceError,
+  type WardrobeRecommendation,
+} from './services/aiService'
 import {
   WeatherApiError,
   fetchCurrentWeather,
@@ -27,8 +32,42 @@ function App() {
   const [weather, setWeather] = useState<CurrentWeather | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<WeatherApiError | null>(null)
+  const [aiRecommendation, setAiRecommendation] =
+    useState<WardrobeRecommendation | null>(null)
+  const [isAiLoading, setIsAiLoading] = useState(false)
+  const [aiError, setAiError] = useState<AiServiceError | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const requestIdRef = useRef(0)
+  const aiAbortRef = useRef<AbortController | null>(null)
+  const aiRequestIdRef = useRef(0)
+
+  const loadWardrobe = useCallback(async (nextWeather: CurrentWeather) => {
+    aiAbortRef.current?.abort()
+    const requestId = ++aiRequestIdRef.current
+    const controller = new AbortController()
+    aiAbortRef.current = controller
+
+    setAiRecommendation(null)
+    setAiError(null)
+    setIsAiLoading(true)
+
+    try {
+      const recommendation = await fetchWardrobeRecommendation(nextWeather, {
+        signal: controller.signal,
+      })
+
+      if (requestId !== aiRequestIdRef.current) return
+
+      setAiRecommendation(recommendation)
+    } catch (cause) {
+      if (controller.signal.aborted || requestId !== aiRequestIdRef.current)
+        return
+
+      setAiError(toAiServiceError(cause))
+    } finally {
+      if (requestId === aiRequestIdRef.current) setIsAiLoading(false)
+    }
+  }, [])
 
   const loadWeather = useCallback(async (rawCity: string) => {
     const city = rawCity.trim()
@@ -60,6 +99,7 @@ function App() {
       if (requestId !== requestIdRef.current) return
 
       setWeather(nextWeather)
+      void loadWardrobe(nextWeather)
     } catch (cause) {
       if (controller.signal.aborted || requestId !== requestIdRef.current) return
 
@@ -67,7 +107,7 @@ function App() {
     } finally {
       if (requestId === requestIdRef.current) setIsLoading(false)
     }
-  }, [])
+  }, [loadWardrobe])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -76,7 +116,10 @@ function App() {
 
     void fetchCurrentWeather(DEFAULT_CITY, { signal: controller.signal })
       .then((nextWeather) => {
-        if (requestId === requestIdRef.current) setWeather(nextWeather)
+        if (requestId !== requestIdRef.current) return
+
+        setWeather(nextWeather)
+        void loadWardrobe(nextWeather)
       })
       .catch((cause: unknown) => {
         if (controller.signal.aborted || requestId !== requestIdRef.current)
@@ -90,9 +133,11 @@ function App() {
 
     return () => {
       requestIdRef.current += 1
+      aiRequestIdRef.current += 1
       abortRef.current?.abort()
+      aiAbortRef.current?.abort()
     }
-  }, [])
+  }, [loadWardrobe])
 
   function handleSearch() {
     void loadWeather(query)
@@ -102,7 +147,12 @@ function App() {
     void loadWeather(query || DEFAULT_CITY)
   }
 
-  const isMissingKey = error?.code === 'missing-api-key'
+  function handleWardrobeRetry() {
+    if (weather) void loadWardrobe(weather)
+  }
+
+  const isWeatherKeyMissing = error?.code === 'missing-api-key'
+  const isAiKeyMissing = aiError?.code === 'missing-api-key'
 
   return (
     <div className="relative flex min-h-svh flex-col">
@@ -137,8 +187,8 @@ function App() {
             Weather, meet <span className="text-sky-600">your wardrobe.</span>
           </h1>
           <p className="mt-3 max-w-lg text-pretty text-[15px] leading-relaxed text-slate-500">
-            Check live conditions, then preview how AI would style the fit. Search
-            any city below to get started.
+            Check live conditions and let AI style the fit. Search any city below
+            to get started.
           </p>
         </section>
 
@@ -164,7 +214,10 @@ function App() {
               <div className="animate-rise [animation-delay:110ms]">
                 <WardrobeCard
                   weather={weather}
-                  wardrobe={buildMockWardrobe(weather)}
+                  recommendation={aiRecommendation}
+                  isLoading={isAiLoading}
+                  error={aiError}
+                  onRetry={isAiKeyMissing ? undefined : handleWardrobeRetry}
                 />
               </div>
             </div>
@@ -175,11 +228,11 @@ function App() {
                   error?.message ?? 'Unable to load the weather right now.'
                 }
                 hint={
-                  isMissingKey
+                  isWeatherKeyMissing
                     ? 'Create a .env file in the project root (next to package.json). A VITE_WEATHER_API_KEY entry is ready in .env.example.'
                     : undefined
                 }
-                onRetry={isMissingKey ? undefined : handleRetry}
+                onRetry={isWeatherKeyMissing ? undefined : handleRetry}
               />
             </div>
           )}
@@ -199,18 +252,32 @@ function App() {
       <footer className="mx-auto w-full max-w-3xl px-5 pb-10 sm:px-8">
         <div className="flex flex-col gap-2 border-t border-slate-900/[0.06] pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {currentYear} Weather Fit · React, Vite &amp; Tailwind CSS</p>
-          <a
-            href="https://openweathermap.org/"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-sm transition hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
-          >
-            <span
-              className="size-1.5 rounded-full bg-emerald-500"
-              aria-hidden="true"
-            />
-            Weather data by OpenWeatherMap
-          </a>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <a
+              href="https://openweathermap.org/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-sm transition hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
+            >
+              <span
+                className="size-1.5 rounded-full bg-emerald-500"
+                aria-hidden="true"
+              />
+              Weather data by OpenWeatherMap
+            </a>
+            <a
+              href="https://groq.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-sm transition hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
+            >
+              <span
+                className="size-1.5 rounded-full bg-sky-500"
+                aria-hidden="true"
+              />
+              AI by Groq
+            </a>
+          </div>
         </div>
       </footer>
     </div>

@@ -115,7 +115,7 @@ export function SearchBar({
           </>
         ) : (
           <span>
-            Live conditions from OpenWeatherMap — wardrobe styling is still a mock.
+            Live conditions from OpenWeatherMap · AI styling by Groq.
           </span>
         )}
       </p>
