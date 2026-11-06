@@ -8,9 +8,9 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
 ## 📱 Project Preview
-*<img width="630" height="871" alt="image" src="https://github.com/user-attachments/assets/a99f1fb9-f392-48d6-9b8d-dcb1ad7e3ac9" />
-*
-`![Weather-Fit Demo](./assets/demo.gif)`
+<img width="630" height="871" alt="image" src="https://github.com/user-attachments/assets/a99f1fb9-f392-48d6-9b8d-dcb1ad7e3ac9" />
+
+
 
 ## 🚀 Overview
 Weather-Fit was built to solve a simple daily problem: figuring out what to wear based on the actual weather. Instead of just showing the temperature, this app fetches real-time meteorological data and feeds it into an advanced Large Language Model (LLM) to generate a practical, stylish outfit recommendation.
