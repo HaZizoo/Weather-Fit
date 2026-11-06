@@ -1,4 +1,4 @@
-# 🌤️ Weather-Fit AI 
+# 🌤️ Weather-Fit
 
 > A smart, real-time wardrobe assistant that generates dynamic outfit recommendations based on live weather data. 
 
@@ -33,8 +33,8 @@ To run this project on your local machine, follow these steps:
 
 **1. Clone the repository**
 ```bash
-git clone [https://github.com/HaZizoo/ai-weather-wardrobe.git](https://github.com/HaZizoo/ai-weather-wardrobe.git)
-cd ai-weather-wardrobe
+git clone https://github.com/HaZizoo/Weather-Fit.git
+cd Weather-Fit
 
 ```
 
