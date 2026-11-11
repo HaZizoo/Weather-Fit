@@ -1,5 +1,56 @@
 # Weather Fit
 
+Weather-aware outfit recommendations from live conditions and a structured AI response.
+
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+
+## Visual preview
+
+Live demo: _add deployment URL_. Add screenshots or a short GIF under `docs/` when deployed.
+
+## System architecture
+
+```mermaid
+flowchart LR
+  U[User] --> UI[React UI]
+  UI -->|current conditions| W[OpenWeatherMap API]
+  UI -->|weather snapshot| G[Groq API]
+  G -->|validated JSON outfit| UI
+```
+
+See the [architecture map](docs/architecture.html). The browser cancels stale requests and validates API responses. For production, proxy both APIs to keep credentials private.
+
+## Key engineering highlights
+
+- Cancels stale requests with `AbortController` and request IDs.
+- Validates weather and AI payloads before rendering.
+- Keeps live weather available if AI styling fails.
+- Covers weather mapping and error normalization with unit tests.
+
+## Local quickstart
+
+```bash
+git clone https://github.com/HaZizoo/Weather-Fit.git
+cd Weather-Fit
+npm install
+copy .env.example .env
+npm run dev
+```
+
+Add valid keys to `.env`, then run `npm test`, `npm run lint`, or `npm run build`.
+
+## Project structure
+
+```text
+src/
+├── components/  # interface and UI states
+├── services/    # API calls, validation, errors
+├── App.tsx      # request orchestration
+└── index.css    # theme and motion
+docs/
+└── architecture.html
+```
+
 A weather-aware wardrobe assistant — search a city, see live current
 conditions, and get an AI-styled outfit recommendation for the day.
 
