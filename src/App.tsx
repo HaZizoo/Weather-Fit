@@ -179,17 +179,14 @@ function App() {
         className="mx-auto w-full max-w-3xl flex-1 px-5 pb-14 pt-10 sm:px-8 sm:pb-16 sm:pt-14"
       >
         <section className="animate-rise">
-          <p className="flex items-center gap-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-700">
-            <span className="h-px w-6 bg-sky-300" aria-hidden="true" />
-            {todayLabel}
-          </p>
-          <h1 className="mt-4 max-w-xl text-balance text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] text-slate-900 sm:text-[44px]">
+          <h1 className="max-w-xl text-balance text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] text-slate-900 sm:text-[44px]">
             Weather, meet <span className="text-sky-600">your wardrobe.</span>
           </h1>
           <p className="mt-3 max-w-lg text-pretty text-[15px] leading-relaxed text-slate-500">
             Check live conditions and let AI style the fit. Search any city below
             to get started.
           </p>
+          <p className="mt-4 text-sm font-medium text-sky-700">{todayLabel}</p>
         </section>
 
         <div className="mt-7 sm:mt-8">
