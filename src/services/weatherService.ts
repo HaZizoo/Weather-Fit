@@ -125,7 +125,7 @@ function isOpenWeatherResponse(value: unknown): value is OpenWeatherResponse {
   )
 }
 
-function toWeatherKind(conditionId: number): WeatherKind {
+export function toWeatherKind(conditionId: number): WeatherKind {
   if (conditionId >= 200 && conditionId < 300) return 'thunderstorm'
   if (conditionId >= 300 && conditionId < 400) return 'drizzle'
   if (conditionId >= 500 && conditionId < 600) return 'rain'
