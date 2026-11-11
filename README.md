@@ -6,7 +6,11 @@ Weather-aware outfit recommendations from live conditions and a structured AI re
 
 ## Visual preview
 
-Live demo: _add deployment URL_. Add screenshots or a short GIF under `docs/` when deployed.
+The dashboard combines current conditions for Düsseldorf with an AI-generated outfit recommendation.
+
+![Weather dashboard](docs/screenshots/weather-dashboard.png)
+
+![Outfit recommendation](docs/screenshots/outfit-recommendation.png)
 
 ## System architecture
 
